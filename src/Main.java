@@ -303,7 +303,7 @@ public class Main {
         final byte[] K = asciiStringToByteArray("");
         final byte[] S = asciiStringToByteArray("D");
 
-        byte[] M = asciiStringToByteArray(m);
+        final byte[] M = asciiStringToByteArray(m);
         
         byte[] hash = SHAKE.KMACXOF256(K, M, L, S);
         
