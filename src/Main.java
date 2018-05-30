@@ -28,7 +28,7 @@ public class Main {
 	public static final String WELCOME_MESSAGE = "Welcome to TCSS 487 Cryptography, please shoose one of the following options :";
 	
 	public static final String[] OPTIONS = {"0) Exit", "1) Hash File", "2) Hash Input Text", 
-			"3) Encrypt File Symmetrically", "4) Decrypt File Symmetrically"
+			"3) Encrypt File Symmetrically", "4) Decrypt File Symmetrically", "5) Create Elliptic Curve Key Pair"
 	};
 	
 	public static final String FILE_INPUT_MESSAGE = "Please input the location of the file you would like to alter: ";
@@ -144,6 +144,25 @@ public class Main {
 		user_prompt();
 	}
     
+	private static void create_key_pair() throws IOException {
+		Scanner in = new Scanner(System.in);
+
+		System.out.println("Save public key file location and name?:");
+		in.nextLine(); // Throw away line.
+		String output = in.next();
+		
+		System.out.println("What is your passphrase?:");
+		in.nextLine(); // Throw away line.
+		String pw = in.next();
+
+        EdwardPoint pk = Part3.generate_key_pair(pw);
+        String save = pk.x + "\n" + pk.y;
+        Files.write(Paths.get(output), save.getBytes());
+        
+		System.out.println();
+		user_prompt();
+	}
+	
     /**
 	 * User prompt, displays the available options and reacts corresponding to the response.
 	 * @throws IOException Exception in case error with file retrieval or option retrieval.
@@ -170,6 +189,8 @@ public class Main {
 			do_sym_encrypt();
 		case '4':
 			do_sym_decrypt();
+		case '5':
+			create_key_pair();
 		default:
 			user_prompt();
 		}

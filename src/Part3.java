@@ -3,7 +3,7 @@ import java.security.spec.ECPoint;
 
 public class Part3 {
 			
-	public static String generate_key_pair(String pw) {
+	public static EdwardPoint generate_key_pair(String pw) {
 	    
 		byte[] K = Util.asciiStringToByteArray(pw);
 		byte[] X = Util.asciiStringToByteArray("");
@@ -24,7 +24,7 @@ public class Part3 {
 		
 		System.out.println("public key y: " + pub_key.y);
 		
-		return "stub";
+		return pub_key;
 	}
 
 }
