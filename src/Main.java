@@ -29,7 +29,8 @@ public class Main {
 	
 	public static final String[] OPTIONS = {"0) Exit", "1) Hash File", "2) Hash Input Text", 
 			"3) Encrypt File Symmetrically", "4) Decrypt File Symmetrically", "5) Create Elliptic Curve Key Pair",
-			"6) Encrypt File With Public Key", "7) Decrypt File Encrypted With Public Key"
+			"6) Encrypt File With Public Key", "7) Decrypt File Encrypted With Public Key", 
+			"8) Sign a file with a given password", "9) Verify a file and a signature file with Private Key" 
 	};
 	
 	public static final String FILE_INPUT_MESSAGE = "Please input the location of the file you would like to alter: ";
@@ -224,6 +225,70 @@ public class Main {
 		user_prompt();
 	}
 	
+	private static void sign_file() throws IOException {
+		Scanner in = new Scanner(System.in);
+		System.out.println(FILE_INPUT_MESSAGE);
+		in.nextLine(); // Throw away line.
+		String file_location = in.next();
+		
+		System.out.println("Save signature file location?:");
+		in.nextLine(); // Throw away line.
+		String output = in.next();
+		
+		System.out.println("passphrase?:");
+		in.nextLine(); // Throw away line.
+		String pw = in.next();
+		
+		String data = Util.read_file(file_location);
+		if (!data.isEmpty()) {
+			
+            String c_text = Part5.sig(data, pw);
+            Files.write(Paths.get(output), c_text.getBytes());
+        } 	
+		System.out.println();
+		user_prompt();
+	}
+	
+	private static void verify() throws IOException {
+		Scanner in = new Scanner(System.in);
+		System.out.println("Original File location?: ");
+		in.nextLine(); // Throw away line.
+		String file_location = in.next();
+		
+		System.out.println("Signed File location?: ");
+		in.nextLine(); // Throw away line.
+		String file_location_signed = in.next();
+		
+		System.out.println("Public Key File Location?:");
+		in.nextLine(); // Throw away line.
+		String pk_file_location = in.next();
+		
+		System.out.println("Z cryptogram?:");
+		in.nextLine(); // Throw away line.
+		String z_str = in.next();
+		
+		String pk_data = Util.read_file(pk_file_location);
+		String data_ori = Util.read_file(file_location);
+		String h = Util.read_file(file_location_signed);
+		if (!pk_data.isEmpty() && !data_ori.isEmpty() && !h.isEmpty()) {
+			String lines[] = pk_data.split("\\r?\\n");
+			String x = lines[0];
+			String y = lines[1];
+			
+			EdwardPoint V = new EdwardPoint(new BigInteger(x), new BigInteger(y));
+			BigInteger Z = new BigInteger(z_str);
+			BigInteger H = new BigInteger(h, 16);
+			
+            String c_text = Part5.verify(H, Z, V, data_ori);
+            
+            System.out.println("H: " + h);
+            System.out.println("H': " + c_text);
+            
+        } 	
+		System.out.println();
+		user_prompt();
+	}
+	
     /**
 	 * User prompt, displays the available options and reacts corresponding to the response.
 	 * @throws IOException Exception in case error with file retrieval or option retrieval.
@@ -256,6 +321,10 @@ public class Main {
 			encrypt_public_key();
 		case '7':
 			decrypt_public_key();	
+		case '8':
+			sign_file();	
+		case '9':
+			verify();
 		default:
 			user_prompt();
 		}

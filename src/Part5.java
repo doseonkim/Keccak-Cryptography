@@ -2,7 +2,7 @@ import java.math.BigInteger;
 
 public class Part5 {
 	
-	public static void sig(String m, String pw) {
+	public static String sig(String m, String pw) {
 		byte[] K = Util.asciiStringToByteArray(pw);
 		byte[] X = Util.asciiStringToByteArray("");
 		int L = 512;
@@ -27,24 +27,17 @@ public class Part5 {
 		S = Util.asciiStringToByteArray("T");
 		
 		byte[] h_byte = SHAKE.KMACXOF256(K, X, L, S);
-		BigInteger h = new BigInteger(h_byte);
+		BigInteger h = new BigInteger(h_byte).mod(EdwardCurve.p);
 		
 		BigInteger z = (k.subtract( (h.multiply(s)) )).mod(EdwardCurve.r);
 		
-		
-		
-		System.out.println("h: " + h.mod(EdwardCurve.p));
+		System.out.println("h: " + Hex.bytes_to_hex(h.toByteArray()));
 		System.out.println("z: " + z);
 		
-		 BigInteger pk_x = new BigInteger("1786809195834544992531552625415921588753052165893517486576193572575579846804266712741676196639621651803122494070269213479238747552723481188673412143480793455");
-	     BigInteger pk_y = new BigInteger("5491406845570931661325960199719625282179988627608682193642176813472048617409894797587157292417823701092031880143115157168807218699475574568673812334906447462");
-	     EdwardPoint V = new EdwardPoint(pk_x, pk_y);
-	     
-	     verify(h, z, V, m);
-		
+		return Hex.bytes_to_hex(h.toByteArray());
 	}
 	
-	public static void verify(BigInteger h, BigInteger z, EdwardPoint V, String m) {
+	public static String verify(BigInteger h, BigInteger z, EdwardPoint V, String m) {
 		EdwardPoint G = new EdwardPoint(new BigInteger("18"));
 		EdwardPoint U = G.exponentiation(z, G);
 		U.add(V.exponentiation(h, V));
@@ -55,9 +48,11 @@ public class Part5 {
 		byte[] S = Util.asciiStringToByteArray("T");
 		
 		byte[] h_byte = SHAKE.KMACXOF256(K, X, L, S);
-		BigInteger h_p = new BigInteger(h_byte);
+		BigInteger h_p = new BigInteger(h_byte).mod(EdwardCurve.p);
 		
 		System.out.println("h_prime = " + h_p);
+		
+		return Hex.bytes_to_hex(h_p.toByteArray());
 		
 	}
 	
