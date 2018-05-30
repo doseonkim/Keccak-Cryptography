@@ -27,13 +27,14 @@ public class Part4 {
 		String c_out = Hex.xor_hex(Hex.bytes_to_hex(prng), Hex.string_to_hex(m));
 		
 		System.out.println("encrypted: " + c_out);	
+		System.out.println("Z.x: " + Z.x);	
+		System.out.println("Z.y: " + Z.y);	
 		
-		decrypt_public_key(c_out, Z);
 		
 		return c_out;
 	}
 	
-	public static void decrypt_public_key(String c, EdwardPoint Z) {
+	public static String decrypt_public_key(String c, EdwardPoint Z) {
 		byte[] pw = Util.asciiStringToByteArray("test");
 		byte[] X = Util.asciiStringToByteArray("");
 		int L = 512;
@@ -61,5 +62,7 @@ public class Part4 {
 		String message = Hex.hex_to_string(Hex.xor_hex(Hex.bytes_to_hex(prng), c));
 		
 		System.out.println("decrypted: " + message);	
+		
+		return message;
 	}
 }

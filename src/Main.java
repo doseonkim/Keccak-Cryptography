@@ -28,7 +28,8 @@ public class Main {
 	public static final String WELCOME_MESSAGE = "Welcome to TCSS 487 Cryptography, please shoose one of the following options :";
 	
 	public static final String[] OPTIONS = {"0) Exit", "1) Hash File", "2) Hash Input Text", 
-			"3) Encrypt File Symmetrically", "4) Decrypt File Symmetrically", "5) Create Elliptic Curve Key Pair"
+			"3) Encrypt File Symmetrically", "4) Decrypt File Symmetrically", "5) Create Elliptic Curve Key Pair",
+			"6) Encrypt File With Public Key", "7) Decrypt File Encrypted With Public Key"
 	};
 	
 	public static final String FILE_INPUT_MESSAGE = "Please input the location of the file you would like to alter: ";
@@ -163,6 +164,66 @@ public class Main {
 		user_prompt();
 	}
 	
+	private static void encrypt_public_key() throws IOException {
+		Scanner in = new Scanner(System.in);
+		System.out.println(FILE_INPUT_MESSAGE);
+		in.nextLine(); // Throw away line.
+		String file_location = in.next();
+		
+		System.out.println("Public Key File Location?:");
+		in.nextLine(); // Throw away line.
+		String pk_file_location = in.next();
+		
+		System.out.println("Save encrypted file location?:");
+		in.nextLine(); // Throw away line.
+		String output = in.next();
+		
+		String pk_data = Util.read_file(pk_file_location);
+		String data = Util.read_file(file_location);
+		if (!pk_data.isEmpty() && !data.isEmpty()) {
+			String lines[] = pk_data.split("\\r?\\n");
+			String x = lines[0];
+			String y = lines[1];
+			
+			EdwardPoint V = new EdwardPoint(new BigInteger(x), new BigInteger(y));
+			
+            String c_text = Part4.encrypt_public_key(data, V);
+            Files.write(Paths.get(output), c_text.getBytes());
+        } 	
+		System.out.println();
+		user_prompt();
+	}
+	
+	private static void decrypt_public_key() throws IOException {
+		Scanner in = new Scanner(System.in);
+		System.out.println(FILE_INPUT_MESSAGE);
+		in.nextLine(); // Throw away line.
+		String file_location = in.next();
+		
+		System.out.println("Z.x cryptogram?:");
+		in.nextLine(); // Throw away line.
+		String Z_x = in.next();
+		
+		System.out.println("Z.y cryptogram?:");
+		in.nextLine(); // Throw away line.
+		String Z_y = in.next();
+		
+		
+		System.out.println("Save decrypted file location?:");
+		in.nextLine(); // Throw away line.
+		String output = in.next();
+
+		String data = Util.read_file(file_location);
+		if (!data.isEmpty()) {
+			EdwardPoint Z = new EdwardPoint(new BigInteger(Z_x), new BigInteger(Z_y));
+			
+            String c_text = Part4.decrypt_public_key(data, Z);
+            Files.write(Paths.get(output), c_text.getBytes());
+        } 	
+		System.out.println();
+		user_prompt();
+	}
+	
     /**
 	 * User prompt, displays the available options and reacts corresponding to the response.
 	 * @throws IOException Exception in case error with file retrieval or option retrieval.
@@ -191,6 +252,10 @@ public class Main {
 			do_sym_decrypt();
 		case '5':
 			create_key_pair();
+		case '6':
+			encrypt_public_key();
+		case '7':
+			decrypt_public_key();	
 		default:
 			user_prompt();
 		}
